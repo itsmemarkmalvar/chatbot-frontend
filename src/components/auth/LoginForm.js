@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/auth.module.css';
+import { setToken, setUser } from '@/utils/auth';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -30,23 +33,27 @@ const LoginForm = () => {
     setIsLoading(true);
     
     try {
-      // TODO: Implement login API call
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include',
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        router.push('/dashboard');
+        setToken(data.token);
+        setUser(data.user);
+        router.push('/chat');
       } else {
-        const data = await response.json();
         setError(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
       setError('An error occurred. Please try again later.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +67,7 @@ const LoginForm = () => {
     <div className={styles.pageWrapper}>
       <main className={styles.authContainer}>
         <section className={styles.formSection}>
-          <div className={styles.logo}>Chatbot AI heh</div>
+          <div className={styles.logo}>Chatbot AI</div>
           <form onSubmit={handleSubmit} className={styles.authForm}>
             {error && <div className={styles.error}>{error}</div>}
             
@@ -75,29 +82,33 @@ const LoginForm = () => {
                 required
                 placeholder="Johnboe@gmail.com"
                 disabled={isLoading}
+                className={error ? styles.inputError : ''}
               />
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="password">Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder="••••••••"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                className={styles.passwordToggle}
-                onClick={togglePasswordVisibility}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
-              </button>
+              <div className={styles.passwordInput}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  className={error ? styles.inputError : ''}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
             </div>
 
             <div className={styles.forgotPassword}>
@@ -109,7 +120,7 @@ const LoginForm = () => {
               className={`${styles.submitButton} ${isLoading ? styles.loading : ''}`}
               disabled={isLoading}
             >
-              Sign in
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
 
             <p className={styles.switchAuth}>

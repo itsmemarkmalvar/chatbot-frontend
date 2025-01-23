@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/auth.module.css';
+import { setToken, setUser } from '@/utils/auth';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -11,7 +14,7 @@ const RegisterForm = () => {
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    password_confirmation: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +27,6 @@ const RegisterForm = () => {
       ...prevState,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -32,7 +34,7 @@ const RegisterForm = () => {
     e.preventDefault();
     setError('');
     
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.password_confirmation) {
       setError('Passwords do not match');
       return;
     }
@@ -45,23 +47,31 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement register API call
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include',
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        router.push('/login'); // Redirect to login after successful registration
+        setToken(data.token);
+        setUser(data.user);
+        router.push('/chat');
       } else {
-        const data = await response.json();
         setError(data.message || 'Registration failed. Please try again.');
+        if (data.errors) {
+          const errorMessages = Object.values(data.errors).flat();
+          setError(errorMessages.join(' '));
+        }
       }
     } catch (err) {
       setError('An error occurred. Please try again later.');
+      console.error('Registration error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +105,7 @@ const RegisterForm = () => {
                 required
                 placeholder="Enter your username"
                 disabled={isLoading}
+                className={error ? styles.inputError : ''}
                 minLength={3}
               />
             </div>
@@ -110,53 +121,60 @@ const RegisterForm = () => {
                 required
                 placeholder="name@company.com"
                 disabled={isLoading}
+                className={error ? styles.inputError : ''}
               />
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="password">Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                placeholder="••••••••"
-                disabled={isLoading}
-                minLength={6}
-              />
-              <button
-                type="button"
-                className={styles.passwordToggle}
-                onClick={() => togglePasswordVisibility('password')}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
-              </button>
+              <div className={styles.passwordInput}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  className={error ? styles.inputError : ''}
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => togglePasswordVisibility('password')}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                placeholder="••••••••"
-                disabled={isLoading}
-                minLength={6}
-              />
-              <button
-                type="button"
-                className={styles.passwordToggle}
-                onClick={() => togglePasswordVisibility('confirm')}
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-              >
-                {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
-              </button>
+              <label htmlFor="password_confirmation">Confirm Password</label>
+              <div className={styles.passwordInput}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="password_confirmation"
+                  name="password_confirmation"
+                  value={formData.password_confirmation}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  className={error ? styles.inputError : ''}
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => togglePasswordVisibility('confirm')}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
             </div>
 
             <button 
@@ -164,7 +182,7 @@ const RegisterForm = () => {
               className={`${styles.submitButton} ${isLoading ? styles.loading : ''}`}
               disabled={isLoading}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
 
             <p className={styles.switchAuth}>
