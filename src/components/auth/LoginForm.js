@@ -60,7 +60,7 @@ const LoginForm = () => {
     <div className={styles.pageWrapper}>
       <main className={styles.authContainer}>
         <section className={styles.formSection}>
-          <div className={styles.logo}>Chatbot AI</div>
+          <div className={styles.logo}>Chatbot AI heh</div>
           <form onSubmit={handleSubmit} className={styles.authForm}>
             {error && <div className={styles.error}>{error}</div>}
             
