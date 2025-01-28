@@ -73,7 +73,9 @@ const RegisterForm = () => {
       setError('An error occurred. Please try again later.');
       console.error('Registration error:', err);
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   };
 
@@ -180,9 +182,11 @@ const RegisterForm = () => {
             <button 
               type="submit" 
               className={`${styles.submitButton} ${isLoading ? styles.loading : ''}`}
-              disabled={isLoading}
+              disabled={isLoading || !formData.username || !formData.email || !formData.password || !formData.password_confirmation}
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              <span className={styles.buttonText}>
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </span>
             </button>
 
             <p className={styles.switchAuth}>
