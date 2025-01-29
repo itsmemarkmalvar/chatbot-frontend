@@ -103,6 +103,27 @@
     flex-direction: column;
     gap: 1rem;
     scroll-behavior: smooth;
+    max-height: calc(100vh - 160px); /* Account for header and input area */
+    min-height: 0; /* Ensures flex child can shrink */
+    margin-bottom: 0; /* Remove any bottom margin */
+}
+
+/* Add scrollbar styling for messages container */
+.messagesContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messagesContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb {
+    background: rgba(64, 192, 87, 0.2);
+    border-radius: 3px;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(64, 192, 87, 0.3);
 }
 
 .messageWrapper {
@@ -188,6 +209,10 @@
 }
 
 .inputArea {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
     padding: 1.5rem 2rem;
     background: rgba(17, 17, 17, 0.95);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -195,6 +220,7 @@
     gap: 1rem;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    z-index: 10;
 }
 
 .input {
@@ -206,6 +232,8 @@
     color: #e2e8f0;
     font-size: 0.9375rem;
     transition: all 0.2s ease;
+    min-height: 3rem; /* Match height with send button */
+    max-height: 3rem; /* Keep consistent height */
 }
 
 .input:focus {
@@ -224,13 +252,17 @@
     color: white;
     border: none;
     border-radius: 0.75rem;
+    min-width: 3rem;
     width: 3rem;
+    min-height: 3rem;
     height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .sendButton:hover:not(:disabled) {
@@ -790,4 +822,24 @@
     font-size: 0.875rem;
     margin: 0.5rem 0;
     animation: fadeIn 0.3s ease-out;
+}
+
+.plansGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.messageContent h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .plansGrid {
+        grid-template-columns: 1fr;
+    }
 } 

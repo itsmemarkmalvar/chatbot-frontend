@@ -3,16 +3,63 @@ import styles from '@/styles/messageTypes.module.css';
 import { FiCheck, FiX, FiAlertCircle, FiArrowRight } from 'react-icons/fi';
 
 export const PlanCard = ({ plan }) => {
+    const renderSpeed = () => {
+        if (plan.speed_day && plan.speed_night) {
+            return (
+                <div className={styles.planSpeedTimeOfDay}>
+                    <div>
+                        <span className={styles.speedValue}>{plan.speed_day}</span>
+                        <span className={styles.speedUnit}>Mbps Day</span>
+                    </div>
+                    <div>
+                        <span className={styles.speedValue}>{plan.speed_night}</span>
+                        <span className={styles.speedUnit}>Mbps Night</span>
+                    </div>
+                </div>
+            );
+        }
+        
+        if (plan.speed_peak && plan.speed_offpeak) {
+            return (
+                <div className={styles.planSpeedTimeOfDay}>
+                    <div>
+                        <span className={styles.speedValue}>{plan.speed_peak}</span>
+                        <span className={styles.speedUnit}>Mbps Peak</span>
+                    </div>
+                    <div>
+                        <span className={styles.speedValue}>{plan.speed_offpeak}</span>
+                        <span className={styles.speedUnit}>Mbps Off-peak</span>
+                    </div>
+                </div>
+            );
+        }
+        
+        if (plan.speed) {
+            return (
+                <div className={styles.planSpeed}>
+                    <span className={styles.speedValue}>{plan.speed}</span>
+                    <span className={styles.speedUnit}>Mbps</span>
+                </div>
+            );
+        }
+
+        return null;
+    };
+
     return (
-        <div className={styles.planCard}>
+        <div className={`${styles.planCard} ${styles[plan.type || 'residential']}`}>
             <div className={styles.planHeader}>
-                <h3>{plan.name}</h3>
+                <div className={styles.planInfo}>
+                    <h3>{plan.name}</h3>
+                    {plan.type && (
+                        <span className={styles.planType}>
+                            {plan.type.charAt(0).toUpperCase() + plan.type.slice(1)}
+                        </span>
+                    )}
+                </div>
                 <span className={styles.planPrice}>₱{plan.price}/mo</span>
             </div>
-            <div className={styles.planSpeed}>
-                <span className={styles.speedValue}>{plan.speed}</span>
-                <span className={styles.speedUnit}>Mbps</span>
-            </div>
+            {renderSpeed()}
             <ul className={styles.planFeatures}>
                 {plan.features.map((feature, index) => (
                     <li key={index}>

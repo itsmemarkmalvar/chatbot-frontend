@@ -1,55 +1,81 @@
 /* Plan Card Styles */
 .planCard {
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 1rem;
-    padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
     transition: all 0.3s ease;
 }
 
 .planCard:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .planHeader {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
 }
 
-.planHeader h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #e2e8f0;
+.planInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.planInfo h3 {
     margin: 0;
+    font-size: 1.25rem;
+    color: #e2e8f0;
+}
+
+.planType {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
 }
 
 .planPrice {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #40C057;
 }
 
 .planSpeed {
     text-align: center;
     margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+}
+
+.planSpeedTimeOfDay {
+    display: flex;
+    justify-content: space-around;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    text-align: center;
 }
 
 .speedValue {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #e2e8f0;
-    background: linear-gradient(135deg, #40C057, #2F9E44);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #40C057;
+    display: block;
 }
 
 .speedUnit {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: #94a3b8;
-    margin-left: 0.5rem;
+    display: block;
+    margin-top: 0.25rem;
 }
 
 .planFeatures {
@@ -62,8 +88,8 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: #e2e8f0;
     margin-bottom: 0.75rem;
+    color: #e2e8f0;
     font-size: 0.9375rem;
 }
 
@@ -75,18 +101,35 @@
 .planButton {
     width: 100%;
     padding: 0.875rem;
-    background: linear-gradient(135deg, #40C057, #2F9E44);
-    border: none;
-    border-radius: 0.5rem;
-    color: white;
-    font-weight: 600;
+    background: rgba(64, 192, 87, 0.1);
+    border: 1px solid rgba(64, 192, 87, 0.2);
+    color: #40C057;
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .planButton:hover {
-    filter: brightness(1.1);
+    background: rgba(64, 192, 87, 0.2);
     transform: translateY(-1px);
+}
+
+/* Plan type specific styles */
+.business {
+    background: linear-gradient(135deg, rgba(64, 192, 87, 0.1), rgba(64, 192, 87, 0.05));
+    border-color: rgba(64, 192, 87, 0.2);
+}
+
+.time_of_day {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(66, 153, 225, 0.05));
+    border-color: rgba(66, 153, 225, 0.2);
+}
+
+.xtreme {
+    background: linear-gradient(135deg, rgba(236, 201, 75, 0.1), rgba(236, 201, 75, 0.05));
+    border-color: rgba(236, 201, 75, 0.2);
 }
 
 /* Troubleshooting Steps Styles */

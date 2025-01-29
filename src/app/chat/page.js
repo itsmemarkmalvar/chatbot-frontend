@@ -21,11 +21,18 @@ export default function ChatPage() {
     const [copiedIndex, setCopiedIndex] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const router = useRouter();
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesContainerRef.current) {
+            const { scrollHeight, clientHeight } = messagesContainerRef.current;
+            messagesContainerRef.current.scrollTo({
+                top: scrollHeight - clientHeight,
+                behavior: 'smooth'
+            });
+        }
     };
 
     useEffect(() => {
@@ -83,7 +90,7 @@ export default function ChatPage() {
 
         try {
             const token = getToken();
-            const response = await fetch(`${API_BASE_URL}/chat`, {
+            const response = await fetch(`${API_BASE_URL}/chat/send`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -96,15 +103,23 @@ export default function ChatPage() {
                 })
             });
 
-            if (response.ok) {
-                const data = await response.json();
+            if (!response.ok) {
+                throw new Error('Failed to fetch response');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
                 const botResponse = {
                     timestamp: new Date().toISOString(),
                     isBot: true,
-                    type: categoryId,
+                    type: data.type,
+                    message: data.message,
                     content: data.content
                 };
                 setMessages(prev => [...prev, botResponse]);
+            } else {
+                throw new Error(data.message || 'Failed to get response');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -157,7 +172,7 @@ export default function ChatPage() {
         setIsTyping(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/chat`, {
+            const response = await fetch(`${API_BASE_URL}/chat/send`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -169,14 +184,23 @@ export default function ChatPage() {
                 })
             });
 
-            if (response.ok) {
-                const data = await response.json();
+            if (!response.ok) {
+                throw new Error('Failed to fetch response');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
                 const botResponse = {
-                    ...data,
                     timestamp: new Date().toISOString(),
-                    isBot: true
+                    isBot: true,
+                    type: data.type,
+                    message: data.message,
+                    content: data.content
                 };
                 setMessages(prev => [...prev, botResponse]);
+            } else {
+                throw new Error(data.message || 'Failed to get response');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -203,10 +227,15 @@ export default function ChatPage() {
         if (message.type === 'plans' && message.content?.plans) {
             return (
                 <div className={styles.messageWrapper} data-user={message.isUser}>
-                    <div className={styles.userMessage}>
-                        {message.content.plans.map((plan, index) => (
-                            <PlanCard key={index} plan={plan} />
-                        ))}
+                    <div className={styles.botMessage}>
+                        <div className={styles.messageContent}>
+                            <h3>Available Plans</h3>
+                            <div className={styles.plansGrid}>
+                                {message.content.plans.map((plan, index) => (
+                                    <PlanCard key={index} plan={plan} />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -275,7 +304,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Messages Container */}
-                <div className={styles.messagesContainer}>
+                <div ref={messagesContainerRef} className={styles.messagesContainer}>
                     <AnimatePresence>
                         {messages.map((message, index) => (
                             <motion.div
