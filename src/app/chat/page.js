@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/chat.module.css';
-import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiMessageSquare } from 'react-icons/fi';
-import { RiRobot2Line, RiCustomerService2Line } from 'react-icons/ri';
+import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw } from 'react-icons/fi';
+import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getToken, removeToken, isAuthenticated, logout } from '@/utils/auth';
+import IspSelector from '@/components/isp/IspSelector';
+import { PlanCard, TroubleshootingSteps, StatusMessage, QuickActions } from '@/components/chat/MessageTypes';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -17,16 +19,10 @@ export default function ChatPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [copiedIndex, setCopiedIndex] = useState(null);
+    const [selectedProvider, setSelectedProvider] = useState(null);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const router = useRouter();
-    const [suggestions, setSuggestions] = useState([]);
-    const [intent, setIntent] = useState(null);
-    const [confidenceScore, setConfidenceScore] = useState(null);
-    const [context, setContext] = useState([]);
-    const [showSettings, setShowSettings] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,7 +33,6 @@ export default function ChatPage() {
             router.push('/login');
             return;
         }
-        loadUsers();
         scrollToBottom();
         inputRef.current?.focus();
     }, []);
@@ -46,41 +41,103 @@ export default function ChatPage() {
         scrollToBottom();
     }, [messages]);
 
-    const loadUsers = async () => {
+    const handleProviderSelect = (provider) => {
+        setSelectedProvider(provider);
+        // Add a system message when provider is selected
+        const systemMessage = {
+            type: 'status',
+            status: {
+                type: 'success',
+                message: `Switched to ${provider.name} support. How can I help you today?`
+            },
+            timestamp: new Date().toISOString()
+        };
+        setMessages(prev => [...prev, systemMessage]);
+    };
+
+    const handleCategorySelect = async (categoryId) => {
+        if (!selectedProvider) {
+            const warningMessage = {
+                type: 'status',
+                status: {
+                    type: 'warning',
+                    message: 'Please select an Internet Service Provider first.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, warningMessage]);
+            return;
+        }
+
+        // Add user category selection message
+        const userMessage = {
+            message: `Show me ${categoryId} for ${selectedProvider.name}`,
+            timestamp: new Date().toISOString(),
+            isUser: true
+        };
+        setMessages(prev => [...prev, userMessage]);
+
+        // Simulate bot processing
+        setIsLoading(true);
+        setIsTyping(true);
+
         try {
             const token = getToken();
-            if (!token) {
-                router.push('/login');
-                return;
-            }
-
-            const response = await fetch(`${API_BASE_URL}/users`, {
-                method: 'GET',
-                credentials: 'include',
+            const response = await fetch(`${API_BASE_URL}/chat`, {
+                method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                    message: userMessage.message,
+                    provider: selectedProvider.name,
+                    category: categoryId
+                })
             });
 
             if (response.ok) {
-                const { data } = await response.json();
-                if (Array.isArray(data)) {
-                    setUsers(data);
-                }
-            } else if (response.status === 401) {
-                removeToken();
-                router.push('/login');
+                const data = await response.json();
+                const botResponse = {
+                    timestamp: new Date().toISOString(),
+                    isBot: true,
+                    type: categoryId,
+                    content: data.content
+                };
+                setMessages(prev => [...prev, botResponse]);
             }
         } catch (error) {
-            console.error('Error loading users:', error);
+            console.error('Error:', error);
+            const errorMessage = {
+                type: 'status',
+                status: {
+                    type: 'error',
+                    message: 'Failed to fetch information. Please try again.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+            setIsTyping(false);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!inputMessage.trim()) return;
+        if (!selectedProvider) {
+            const warningMessage = {
+                type: 'status',
+                status: {
+                    type: 'warning',
+                    message: 'Please select an Internet Service Provider first.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, warningMessage]);
+            return;
+        }
 
         const token = getToken();
         if (!token) {
@@ -94,7 +151,6 @@ export default function ChatPage() {
             isUser: true
         };
 
-        // Add user message immediately
         setMessages(prev => [...prev, newUserMessage]);
         setInputMessage('');
         setIsLoading(true);
@@ -103,64 +159,79 @@ export default function ChatPage() {
         try {
             const response = await fetch(`${API_BASE_URL}/chat`, {
                 method: 'POST',
-                credentials: 'include',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     message: inputMessage,
-                    context: context 
+                    provider: selectedProvider.name
                 })
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setIsTyping(false);
-                
-                if (data.suggestions) setSuggestions(data.suggestions);
-                if (data.intent) setIntent(data.intent);
-                if (data.confidence) setConfidenceScore(data.confidence);
-                if (data.context) setContext(data.context);
-
-                // Add bot response as a new message
                 const botResponse = {
-                    message: data.response || data.message,
+                    ...data,
                     timestamp: new Date().toISOString(),
-                    isBot: true,
-                    intent: data.intent,
-                    confidence: data.confidence
+                    isBot: true
                 };
-
                 setMessages(prev => [...prev, botResponse]);
-            } else if (response.status === 401) {
-                removeToken();
-                router.push('/login');
             }
         } catch (error) {
-            console.error('Error sending message:', error);
-            setIsTyping(false);
+            console.error('Error:', error);
+            const errorMessage = {
+                type: 'status',
+                status: {
+                    type: 'error',
+                    message: 'Failed to send message. Please try again.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
+            setIsTyping(false);
         }
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(e);
+    const renderMessage = (message) => {
+        if (message.type === 'status') {
+            return <StatusMessage status={message.status} />;
         }
-    };
 
-    const copyToClipboard = async (text, index) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopiedIndex(index);
-            setTimeout(() => setCopiedIndex(null), 2000);
-        } catch (err) {
-            console.error('Failed to copy text:', err);
+        if (message.type === 'plans' && message.content?.plans) {
+            return (
+                <div className={styles.messageWrapper} data-user={message.isUser}>
+                    <div className={styles.userMessage}>
+                        {message.content.plans.map((plan, index) => (
+                            <PlanCard key={index} plan={plan} />
+                        ))}
+                    </div>
+                </div>
+            );
         }
+
+        if (message.type === 'support' && message.content?.steps) {
+            return (
+                <div className={styles.messageWrapper} data-user={message.isUser}>
+                    <div className={styles.botMessage}>
+                        <TroubleshootingSteps steps={message.content.steps} />
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className={styles.messageWrapper} data-user={message.isUser}>
+                <div className={message.isUser ? styles.userMessage : styles.botMessage}>
+                    <div className={styles.messageContent}>
+                        <ReactMarkdown>{message.message}</ReactMarkdown>
+                        {message.actions && <QuickActions actions={message.actions} />}
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     const handleLogout = async () => {
@@ -168,188 +239,86 @@ export default function ChatPage() {
         router.push('/login');
     };
 
-    const formatTimestamp = (timestamp) => {
-        return new Date(timestamp).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
-
-    const handleSuggestionClick = (suggestion) => {
-        setInputMessage(suggestion);
-        handleSubmit({ preventDefault: () => {} });
-    };
-
-    const renderSuggestions = () => {
-        if (!suggestions.length) return null;
-        
-        return (
-            <div className={styles.suggestionsContainer}>
-                {suggestions.map((suggestion, index) => (
-                    <button
-                        key={index}
-                        className={styles.suggestionButton}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                        {suggestion}
-                    </button>
-                ))}
-            </div>
-        );
-    };
-
-    const renderIntentInfo = (msg) => {
-        if (!msg.intent || !msg.confidence) return null;
-        
-        return (
-            <div className={styles.intentInfo}>
-                <span className={styles.intentLabel}>
-                    Intent: {msg.intent}
-                </span>
-                <div className={styles.confidenceBar}>
-                    <div 
-                        className={styles.confidenceFill}
-                        style={{ width: `${msg.confidence * 100}%` }}
-                    />
-                </div>
-            </div>
-        );
-    };
-
-    const renderUsers = () => (
-        <div className={styles.usersList}>
-            {users.map((user) => (
-                <div
-                    key={user.id}
-                    className={`${styles.userItem} ${selectedUser?.id === user.id ? styles.selectedUser : ''}`}
-                    onClick={() => setSelectedUser(user)}
-                >
-                    <div className={styles.userItemContent}>
-                        <div className={styles.userAvatar}>
-                            <FiUser className={styles.userAvatarIcon} />
-                            {user.online && <div className={styles.onlineIndicator} />}
-                        </div>
-                        <div className={styles.userInfo}>
-                            <p className={styles.userName}>{user.name}</p>
-                            <span className={styles.userStatus}>
-                                {user.online ? 'Online' : 'Offline'}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-
     return (
         <div className={styles.mainContainer}>
-            {/* Left Panel - Users List */}
-            <div className={styles.usersPanel}>
-                <div className={styles.usersHeader}>
-                    <h2>Chats</h2>
-                    <button className={styles.headerButton} onClick={loadUsers}>
-                        <FiRefreshCw />
-                    </button>
-                </div>
-                {renderUsers()}
+            {/* Left Panel - ISP Selector */}
+            <div className={styles.leftPanel}>
+                <IspSelector
+                    selectedProvider={selectedProvider?.name}
+                    onProviderSelect={handleProviderSelect}
+                    onCategorySelect={handleCategorySelect}
+                />
             </div>
 
-            {/* Right Panel - Active Chat */}
+            {/* Chat Panel */}
             <div className={styles.chatPanel}>
+                {/* Chat Header */}
                 <div className={styles.chatHeader}>
                     <div className={styles.headerContent}>
-                        <div className={styles.logoContainer}>
-                            <RiRobot2Line className={styles.botIcon} />
-                            <div className={styles.iconRing}></div>
-                        </div>
+                        <RiRobot2Line className={styles.botIcon} />
                         <div className={styles.headerText}>
-                            <h1>AI Customer Service</h1>
-                            <p className={styles.statusText}>Online</p>
+                            <h1>ISP Support Assistant</h1>
+                            <p className={styles.statusText}>
+                                {selectedProvider 
+                                    ? `${selectedProvider.name} Support Active`
+                                    : 'Select an ISP to begin'}
+                            </p>
                         </div>
-                        <div className={styles.headerControls}>
-                            <button className={styles.headerButton} onClick={handleLogout}>
-                                <FiLogOut />
-                            </button>
-                        </div>
+                        <button 
+                            className={styles.logoutButton}
+                            onClick={handleLogout}
+                            title="Logout"
+                        >
+                            <FiLogOut />
+                        </button>
                     </div>
                 </div>
 
+                {/* Messages Container */}
                 <div className={styles.messagesContainer}>
                     <AnimatePresence>
-                        {messages.map((msg, index) => (
+                        {messages.map((message, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                className={styles.messageGroup}
+                                exit={{ opacity: 0 }}
+                                className={styles.messageWrapper}
                             >
-                                <div className={`${styles.messageWrapper} ${msg.isUser ? styles.userMessage : styles.botMessage}`}>
-                                    <div className={styles.messageHeader}>
-                                        {msg.isUser ? (
-                                            <>
-                                                <span className={styles.timestamp}>{formatTimestamp(msg.timestamp)}</span>
-                                                <FiUser className={styles.userIcon} />
-                                            </>
-                                        ) : (
-                                            <>
-                                                <RiRobot2Line className={styles.botIcon} />
-                                                <span className={styles.timestamp}>{formatTimestamp(msg.timestamp)}</span>
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className={styles.messageContent}>
-                                        {msg.isUser ? (
-                                            msg.message
-                                        ) : (
-                                            <ReactMarkdown>{msg.message}</ReactMarkdown>
-                                        )}
-                                        {!msg.isUser && (
-                                            <button
-                                                className={styles.copyButton}
-                                                onClick={() => copyToClipboard(msg.message, index)}
-                                                title="Copy to clipboard"
-                                            >
-                                                {copiedIndex === index ? <FiCheck /> : <FiCopy />}
-                                            </button>
-                                        )}
-                                    </div>
-                                    {!msg.isUser && renderIntentInfo(msg)}
-                                </div>
+                                {renderMessage(message)}
                             </motion.div>
                         ))}
                     </AnimatePresence>
                     {isTyping && (
                         <div className={styles.typingIndicator}>
-                            <div className={styles.dot}></div>
-                            <div className={styles.dot}></div>
-                            <div className={styles.dot}></div>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
-                    {renderSuggestions()}
                 </div>
 
-                <form onSubmit={handleSubmit} className={styles.inputForm}>
-                    <div className={styles.inputWrapper}>
-                        <textarea
-                            ref={inputRef}
-                            className={styles.input}
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            placeholder="Type your message here... (Press Enter to send)"
-                            rows={1}
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
+                {/* Input Area */}
+                <form onSubmit={handleSubmit} className={styles.inputArea}>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder={selectedProvider 
+                            ? `Ask ${selectedProvider.name} Support a question...`
+                            : "Select an ISP to start chatting..."
+                        }
+                        disabled={!selectedProvider || isLoading}
+                        className={styles.input}
+                    />
+                    <button
+                        type="submit"
+                        disabled={!selectedProvider || isLoading || !inputMessage.trim()}
                         className={styles.sendButton}
-                        disabled={isLoading || !inputMessage.trim()}
                     >
-                        <FiSend className={styles.sendIcon} />
-                        <div className={styles.sendButtonRipple} />
+                        <FiSend />
                     </button>
                 </form>
             </div>
