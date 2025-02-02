@@ -262,4 +262,58 @@
 .actionButton:hover .actionArrow {
     opacity: 1;
     transform: translateX(0);
+}
+
+.quickAccessContainer {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quickAccessTitle {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.quickAccessButtons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.quickAccessButton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--button-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quickAccessButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quickAccessButton.technicalSupport {
+    background: var(--support-button-bg, #2563eb);
+    color: white;
+}
+
+.quickAccessButton.billing {
+    background: var(--billing-button-bg, #059669);
+    color: white;
+}
+
+.buttonIcon {
+    font-size: 1.25rem;
 } 

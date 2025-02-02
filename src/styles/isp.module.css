@@ -156,4 +156,15 @@
 
 .ispSelectorContainer {
     animation: fadeIn 0.3s ease-out;
+}
+
+.ispSelector {
+    padding: 1.5rem;
+}
+
+.ispSelector h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    font-weight: 600;
 } 

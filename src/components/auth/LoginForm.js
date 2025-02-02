@@ -132,8 +132,17 @@ const LoginForm = () => {
         <section className={styles.contentSection}>
           <div className={styles.mainCard}>
             <div className={styles.testimonial}>
-              <h3>An Al-Powered Chatbot.</h3>
-              <p>"AI-powered chatbot designed to revolutionize customer service interactions."</p>
+              <div className={styles.botIcon}>🤖</div>
+              <h3>An AI-Powered Chatbot.</h3>
+              <div className={styles.features}>
+                <p className={styles.mainFeature}>"AI-powered chatbot designed to revolutionize customer service interactions."</p>
+                <ul className={styles.featureList}>
+                  <li>✨ Instant ISP Support</li>
+                  <li>🔍 Smart Problem Resolution</li>
+                  <li>💬 24/7 Availability</li>
+                  <li>📊 Real-time Plan Comparisons</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>

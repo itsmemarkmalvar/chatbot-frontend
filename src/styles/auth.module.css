@@ -13,7 +13,7 @@
   grid-template-columns: 1fr 1fr;
   width: 100%;
   max-width: 1000px;
-  min-height: 500px;
+  min-height: 450px;
   background: #111111;
   border-radius: 24px;
   overflow: hidden;
@@ -28,11 +28,11 @@
 
 /* Register specific container height */
 .registerContainer {
-  min-height: 600px;
+  min-height: 520px;
 }
 
 .formSection {
-  padding: 2.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   background: radial-gradient(circle at center, rgba(64, 192, 87, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
@@ -41,19 +41,17 @@
 
 /* Register specific form section */
 .registerContainer .formSection {
-  padding: 2rem 2.5rem;
+  padding: 1.5rem 1.75rem;
 }
 
 .contentSection {
-  background: radial-gradient(circle at center, rgba(64, 192, 87, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: white;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(64, 192, 87, 0.1), rgba(47, 158, 68, 0.05));
   overflow: hidden;
-  border-radius: 0 24px 24px 0;
+  padding: 2rem;
 }
 
 .contentSection::before {
@@ -69,18 +67,15 @@
 }
 
 .mainCard {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
-  border-radius: 24px;
-  padding: 2.5rem;
   position: relative;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 1.75rem;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateZ(0);
+  z-index: 1;
+  animation: slideIn 0.5s ease;
 }
 
 .mainCard:hover {
@@ -111,12 +106,12 @@
   color: white;
   font-size: 1.25rem;
   font-weight: 500;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.25rem;
 }
 
 /* Register specific logo */
 .registerContainer .logo {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 600;
   background: linear-gradient(135deg, #40C057, #2F9E44);
@@ -129,28 +124,101 @@
 .authForm {
   width: 100%;
   max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .authForm h2 {
   color: white;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   font-size: 1.25rem;
   font-weight: 400;
 }
 
 /* Register specific heading */
 .registerContainer .authForm h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 500;
   color: white;
 }
 
 .formGroup {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0;
+  width: 100%;
   position: relative;
-  animation: slideIn 0.3s ease;
-  animation-fill-mode: both;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.termsContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.termsText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  position: relative;
+  margin-top: 3px;
+}
+
+.checkbox:checked {
+  background: #40C057;
+  border-color: #40C057;
+}
+
+.checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 10px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.termsLink {
+  background: none;
+  border: none;
+  color: #40C057;
+  padding: 0;
+  margin: 0 2px;
+  font-size: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: inline;
+}
+
+.termsLink:hover {
+  color: #2F9E44;
+  text-decoration: underline;
 }
 
 .formGroup:nth-child(1) { animation-delay: 0.1s; }
@@ -160,13 +228,13 @@
 
 /* Register specific form groups */
 .registerContainer .formGroup {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   position: relative;
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: white;
   font-size: 0.875rem;
   opacity: 0.9;
@@ -174,20 +242,9 @@
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.formGroup input {
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid transparent;
-  border-radius: 8px;
-  color: white;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-}
-
 /* Register specific inputs */
 .registerContainer .formGroup input {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.75rem;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -262,7 +319,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
   box-shadow: 0 4px 12px rgba(64, 192, 87, 0.25);
 }
 
@@ -315,13 +372,14 @@
 
 .forgotPassword {
   text-align: right;
-  margin: 0.5rem 0 1rem;
+  margin: -0.25rem 0 0.75rem;
 }
 
 .forgotPassword a {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.75rem;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .forgotPassword a:hover {
@@ -402,66 +460,84 @@
 }
 
 .testimonial {
-  position: relative;
-  padding-left: 1rem;
-  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.botIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
 }
 
 .testimonial h3 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.2;
-  color: #111111;
+  color: #1a1a1a;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, #2F9E44, #40C057);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.mainFeature {
+  color: #4a4a4a;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.featureList li {
+  color: #2c2c2c;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  transition: all 0.3s ease;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(64, 192, 87, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
-.testimonial h3::before {
-  content: '🤖';
-  font-size: 2rem;
-  transition: transform 0.3s ease;
+.featureList li:hover {
+  transform: translateX(4px);
+  background: rgba(64, 192, 87, 0.15);
 }
 
-.mainCard:hover .testimonial h3::before {
-  transform: scale(1.1) rotate(5deg);
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.testimonial p {
-  font-size: 1.125rem;
-  color: #4B5563;
-  margin-bottom: 1rem;
-  line-height: 1.6;
-  position: relative;
-  padding-left: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.testimonial p::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.5rem;
-  width: 3px;
-  height: calc(100% - 1rem);
-  background: linear-gradient(to bottom, #40C057, rgba(64, 192, 87, 0.2));
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.mainCard:hover .testimonial p::before {
-  height: calc(100% - 0.5rem);
-  background: linear-gradient(to bottom, #37A84D, rgba(64, 192, 87, 0.3));
-}
-
-.testimonialAuthor {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: #666666;
-  margin-top: auto;
-  padding-left: 1.5rem;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Remove all content card related styles */
@@ -534,4 +610,9 @@
   to {
     opacity: 1;
   }
+}
+
+/* Specific styles for login form */
+.authContainer:not(.registerContainer) .formGroup {
+  margin-bottom: 0.5rem;
 } 

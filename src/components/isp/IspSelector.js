@@ -30,46 +30,45 @@ const categories = [
 
 const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) => {
     return (
-        <div className={styles.ispSelectorContainer}>
-            <div className={styles.ispHeader}>
-                <h2>Select Internet Service Provider</h2>
-            </div>
-            
-            <div className={styles.providersGrid}>
-                {providers.map((provider) => (
-                    <button
-                        key={provider.name}
-                        className={`${styles.providerButton} ${selectedProvider === provider.name ? styles.active : ''}`}
-                        onClick={() => onProviderSelect(provider)}
-                        style={{ '--provider-color': provider.color }}
-                    >
-                        <div className={styles.providerLogo}>
-                            <Image
-                                src={provider.logo}
-                                alt={provider.name}
-                                width={48}
-                                height={48}
-                                priority
-                            />
-                        </div>
-                        <span className={styles.providerName}>{provider.name}</span>
-                    </button>
-                ))}
-            </div>
-
-            <div className={styles.categorySection}>
-                <h3>Quick Access</h3>
-                <div className={styles.categoryGrid}>
-                    {categories.map((category) => (
+        <div className={styles.ispSelector}>
+            <h2>Select Internet Service Provider</h2>
+            <div className={styles.ispSelectorContainer}>
+                <div className={styles.providersGrid}>
+                    {providers.map((provider) => (
                         <button
-                            key={category.id}
-                            className={styles.categoryButton}
-                            onClick={() => onCategorySelect(category.id)}
+                            key={provider.name}
+                            className={`${styles.providerButton} ${selectedProvider === provider.name ? styles.active : ''}`}
+                            onClick={() => onProviderSelect(provider)}
+                            style={{ '--provider-color': provider.color }}
                         >
-                            <span className={styles.categoryIcon}>{category.icon}</span>
-                            <span className={styles.categoryName}>{category.name}</span>
+                            <div className={styles.providerLogo}>
+                                <Image
+                                    src={provider.logo}
+                                    alt={provider.name}
+                                    width={48}
+                                    height={48}
+                                    priority
+                                />
+                            </div>
+                            <span className={styles.providerName}>{provider.name}</span>
                         </button>
                     ))}
+                </div>
+
+                <div className={styles.categorySection}>
+                    <h3>Quick Access</h3>
+                    <div className={styles.categoryGrid}>
+                        {categories.map((category) => (
+                            <button
+                                key={category.id}
+                                className={styles.categoryButton}
+                                onClick={() => onCategorySelect(category.id)}
+                            >
+                                <span className={styles.categoryIcon}>{category.icon}</span>
+                                <span className={styles.categoryName}>{category.name}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getToken, removeToken, isAuthenticated, logout } from '@/utils/auth';
 import IspSelector from '@/components/isp/IspSelector';
 import { PlanCard, TroubleshootingSteps, StatusMessage, QuickActions } from '@/components/chat/MessageTypes';
+import { ChatHistory } from '@/components/chat/ChatHistory';
+import { LeftPanel } from '@/components/layout/LeftPanel';
+import Notification from '@/components/common/Notification';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -20,10 +23,12 @@ export default function ChatPage() {
     const [isTyping, setIsTyping] = useState(false);
     const [copiedIndex, setCopiedIndex] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
+    const [selectedChat, setSelectedChat] = useState(null);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const router = useRouter();
+    const [notification, setNotification] = useState({ message: '', type: '' });
 
     const scrollToBottom = () => {
         if (messagesContainerRef.current) {
@@ -268,16 +273,44 @@ export default function ChatPage() {
         router.push('/login');
     };
 
+    const handleChatSelect = (chat) => {
+        setSelectedChat(chat);
+        // Add the selected chat to the messages
+        const chatMessages = [
+            {
+                message: chat.message,
+                timestamp: chat.created_at,
+                isUser: true
+            },
+            {
+                message: chat.response,
+                timestamp: chat.created_at,
+                isBot: true,
+                type: chat.type,
+                content: chat.metadata ? JSON.parse(chat.metadata) : null
+            }
+        ];
+        setMessages(chatMessages);
+    };
+
+    const handleNotification = (message, type) => {
+        setNotification({ message, type });
+    };
+
     return (
         <div className={styles.mainContainer}>
-            {/* Left Panel - ISP Selector */}
-            <div className={styles.leftPanel}>
-                <IspSelector
-                    selectedProvider={selectedProvider?.name}
-                    onProviderSelect={handleProviderSelect}
-                    onCategorySelect={handleCategorySelect}
-                />
-            </div>
+            <Notification 
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification({ message: '', type: '' })}
+            />
+            <LeftPanel
+                selectedProvider={selectedProvider}
+                onProviderSelect={handleProviderSelect}
+                onCategorySelect={handleCategorySelect}
+                onSelectChat={handleChatSelect}
+                onNotification={handleNotification}
+            />
 
             {/* Chat Panel */}
             <div className={styles.chatPanel}>
@@ -305,6 +338,12 @@ export default function ChatPage() {
 
                 {/* Messages Container */}
                 <div ref={messagesContainerRef} className={styles.messagesContainer}>
+                    {messages.length === 0 && (
+                        <div className={styles.welcomeMessage}>
+                            <h2>Welcome to ISP Support Chat!</h2>
+                            <p>Select your ISP provider and start chatting</p>
+                        </div>
+                    )}
                     <AnimatePresence>
                         {messages.map((message, index) => (
                             <motion.div

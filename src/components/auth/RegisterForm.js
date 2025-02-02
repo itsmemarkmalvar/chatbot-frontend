@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/auth.module.css';
 import { setToken, setUser } from '@/utils/auth';
+import Modal from '@/components/common/Modal';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -20,6 +21,8 @@ const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +37,11 @@ const RegisterForm = () => {
     e.preventDefault();
     setError('');
     
+    if (!acceptedTerms) {
+      setError('You must accept the Terms and Conditions to create an account');
+      return;
+    }
+
     if (formData.password !== formData.password_confirmation) {
       setError('Passwords do not match');
       return;
@@ -86,6 +94,33 @@ const RegisterForm = () => {
       setShowConfirmPassword(!showConfirmPassword);
     }
   };
+
+  const termsAndConditions = (
+    <div>
+      <h3>1. Acceptance of Terms</h3>
+      <p>By accessing and using this ISP Support Chatbot, you agree to be bound by these Terms and Conditions.</p>
+
+      <h3>2. Service Description</h3>
+      <p>We provide an AI-powered chatbot service to assist with ISP-related inquiries and support.</p>
+
+      <h3>3. User Obligations</h3>
+      <ul>
+        <li>Provide accurate and complete information when using the service</li>
+        <li>Maintain the security of your account credentials</li>
+        <li>Use the service in compliance with applicable laws and regulations</li>
+        <li>Not attempt to reverse engineer or compromise the service</li>
+      </ul>
+
+      <h3>4. Privacy and Data Protection</h3>
+      <p>We collect and process personal data as described in our Privacy Policy. By using our service, you consent to such processing.</p>
+
+      <h3>5. Limitation of Liability</h3>
+      <p>The service is provided "as is" without warranties of any kind, either express or implied.</p>
+
+      <h3>6. Changes to Terms</h3>
+      <p>We reserve the right to modify these terms at any time. Continued use of the service constitutes acceptance of modified terms.</p>
+    </div>
+  );
 
   return (
     <div className={styles.pageWrapper}>
@@ -179,10 +214,31 @@ const RegisterForm = () => {
               </div>
             </div>
 
+            <div className={styles.termsContainer}>
+              <input
+                type="checkbox"
+                id="terms"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className={styles.checkbox}
+              />
+              <label htmlFor="terms" className={styles.termsText}>
+                I agree to the <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className={styles.termsLink}
+                >Terms of Service</button> and <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className={styles.termsLink}
+                >Privacy Policy</button>
+              </label>
+            </div>
+
             <button 
               type="submit" 
               className={`${styles.submitButton} ${isLoading ? styles.loading : ''}`}
-              disabled={isLoading || !formData.username || !formData.email || !formData.password || !formData.password_confirmation}
+              disabled={isLoading || !formData.username || !formData.email || !formData.password || !formData.password_confirmation || !acceptedTerms}
             >
               <span className={styles.buttonText}>
                 {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -198,12 +254,29 @@ const RegisterForm = () => {
         <section className={styles.contentSection}>
           <div className={styles.mainCard}>
             <div className={styles.testimonial}>
-              <h3>Join our community.</h3>
-              <p>"Talk to our AI chatbot and get the best customer service experience."</p>
+              <div className={styles.botIcon}>🚀</div>
+              <h3>Join Our Smart Support Community</h3>
+              <div className={styles.features}>
+                <p className={styles.mainFeature}>"Experience the future of ISP customer support with our AI-powered platform."</p>
+                <ul className={styles.featureList}>
+                  <li>🎯 Personalized Support Experience</li>
+                  <li>⚡ Quick Issue Resolution</li>
+                  <li>📱 Multi-Provider Support</li>
+                  <li>🔐 Secure Account Management</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
       </main>
+
+      <Modal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        title="Terms and Conditions"
+      >
+        {termsAndConditions}
+      </Modal>
     </div>
   );
 };
