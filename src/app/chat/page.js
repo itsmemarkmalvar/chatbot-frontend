@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/chat.module.css';
-import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw } from 'react-icons/fi';
+import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool, FiDollarSign } from 'react-icons/fi';
 import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -339,9 +339,41 @@ export default function ChatPage() {
                 {/* Messages Container */}
                 <div ref={messagesContainerRef} className={styles.messagesContainer}>
                     {messages.length === 0 && (
-                        <div className={styles.welcomeMessage}>
-                            <h2>Welcome to ISP Support Chat!</h2>
-                            <p>Select your ISP provider and start chatting</p>
+                        <div className={styles.welcomeContainer}>
+                            <h1 className={styles.welcomeTitle}>Welcome to ISP Support Assistant</h1>
+                            <p className={styles.welcomeSubtitle}>
+                                Your one-stop solution for all your internet service needs. Get instant support, check plans, and resolve issues with our AI-powered assistant.
+                            </p>
+                            
+                            <div className={styles.welcomeFeatures}>
+                                <div className={styles.featureItem}>
+                                    <div className={styles.featureIcon}>
+                                        <FiWifi />
+                                    </div>
+                                    <h3 className={styles.featureTitle}>24/7 Support</h3>
+                                    <p className={styles.featureDescription}>
+                                        Get instant assistance anytime with our AI-powered support system
+                                    </p>
+                                </div>
+                                
+                                <div className={styles.featureItem}>
+                                    <div className={styles.featureIcon}>
+                                        <FiTool />
+                                    </div>
+                                    <h3 className={styles.featureTitle}>Quick Solutions</h3>
+                                    <p className={styles.featureDescription}>
+                                        Troubleshoot common issues and get step-by-step guidance
+                                    </p>
+                                </div>
+                                
+                            </div>
+
+                            <button 
+                                className={styles.startButton}
+                                onClick={() => document.querySelector(`.${styles.input}`).focus()}
+                            >
+                                Get Started
+                            </button>
                         </div>
                     )}
                     <AnimatePresence>
