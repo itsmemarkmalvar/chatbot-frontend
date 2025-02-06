@@ -25,11 +25,59 @@ export default function ChatPage() {
     const [copiedIndex, setCopiedIndex] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const router = useRouter();
     const [notification, setNotification] = useState({ message: '', type: '' });
+
+    // Fetch user info on component mount
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const token = getToken();
+                if (!token) {
+                    router.push('/login');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/user/info`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        setUserInfo(data);
+                    } else {
+                        console.error('Failed to fetch user info:', data.error);
+                        setNotification({
+                            message: 'Failed to load user information',
+                            type: 'error'
+                        });
+                    }
+                } else if (response.status === 401) {
+                    // Unauthorized - token expired or invalid
+                    removeToken();
+                    router.push('/login');
+                } else {
+                    throw new Error('Failed to fetch user info');
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                setNotification({
+                    message: 'Error loading user information',
+                    type: 'error'
+                });
+            }
+        };
+
+        fetchUserInfo();
+    }, [router]);
 
     const scrollToBottom = () => {
         if (messagesContainerRef.current) {
@@ -72,12 +120,20 @@ export default function ChatPage() {
 
     const handleProviderSelect = (provider) => {
         setSelectedProvider(provider);
+        const aiName = getIspAiName(provider.name);
+        const aiFullName = getIspAiFullName(provider.name);
+        
+        // Create a more personalized welcome message
+        const welcomeMessage = userInfo?.name
+            ? `Hi ${userInfo.name}! I'm ${aiName} (${aiFullName}), your dedicated ${provider.name} support assistant. How can I help you today?`
+            : `Welcome! I'm ${aiName} (${aiFullName}), your dedicated ${provider.name} support assistant. How can I help you today?`;
+
         // Add a system message when provider is selected
         const systemMessage = {
             type: 'status',
             status: {
                 type: 'success',
-                message: `Switched to ${provider.name} support. How can I help you today?`
+                message: welcomeMessage
             },
             timestamp: new Date().toISOString()
         };
@@ -202,7 +258,8 @@ export default function ChatPage() {
                 },
                 body: JSON.stringify({
                     message: inputMessage,
-                    provider: selectedProvider.name
+                    provider: selectedProvider.name,
+                    userName: userInfo?.name // Send user name to backend
                 })
             });
 
