@@ -365,7 +365,6 @@ export default function ChatPage() {
                                         Troubleshoot common issues and get step-by-step guidance
                                     </p>
                                 </div>
-                                
                             </div>
 
                             <button 
