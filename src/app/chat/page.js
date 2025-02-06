@@ -13,6 +13,7 @@ import { PlanCard, TroubleshootingSteps, StatusMessage, QuickActions } from '@/c
 import { ChatHistory } from '@/components/chat/ChatHistory';
 import { LeftPanel } from '@/components/layout/LeftPanel';
 import Notification from '@/components/common/Notification';
+import { getIspAiName, getIspAiFullName } from '@/utils/ispConfig';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -32,26 +33,42 @@ export default function ChatPage() {
 
     const scrollToBottom = () => {
         if (messagesContainerRef.current) {
-            const { scrollHeight, clientHeight } = messagesContainerRef.current;
-            messagesContainerRef.current.scrollTo({
-                top: scrollHeight - clientHeight,
+            const container = messagesContainerRef.current;
+            const scrollHeight = container.scrollHeight;
+            const height = container.clientHeight;
+            const maxScroll = scrollHeight - height;
+            
+            // Smooth scroll to bottom
+            container.scrollTo({
+                top: maxScroll,
                 behavior: 'smooth'
             });
         }
     };
 
+    // Scroll to bottom on initial load and when messages change
     useEffect(() => {
         if (!isAuthenticated()) {
             router.push('/login');
             return;
         }
-        scrollToBottom();
+        
+        // Small delay to ensure content is rendered
+        setTimeout(scrollToBottom, 100);
         inputRef.current?.focus();
     }, []);
 
     useEffect(() => {
-        scrollToBottom();
+        // Scroll when new messages are added
+        setTimeout(scrollToBottom, 100);
     }, [messages]);
+
+    // Scroll when typing indicator appears
+    useEffect(() => {
+        if (isTyping) {
+            setTimeout(scrollToBottom, 100);
+        }
+    }, [isTyping]);
 
     const handleProviderSelect = (provider) => {
         setSelectedProvider(provider);
@@ -319,12 +336,17 @@ export default function ChatPage() {
                     <div className={styles.headerContent}>
                         <RiRobot2Line className={styles.botIcon} />
                         <div className={styles.headerText}>
-                            <h1>ISP Support Assistant</h1>
+                            <h1>{selectedProvider ? getIspAiName(selectedProvider.name) : 'ISP Support Assistant'}</h1>
                             <p className={styles.statusText}>
                                 {selectedProvider 
                                     ? `${selectedProvider.name} Support Active`
                                     : 'Select an ISP to begin'}
                             </p>
+                            {selectedProvider && (
+                                <p className={styles.aiSubtitle}>
+                                    {getIspAiFullName(selectedProvider.name)}
+                                </p>
+                            )}
                         </div>
                         <button 
                             className={styles.logoutButton}
