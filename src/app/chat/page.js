@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/chat.module.css';
-import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool, FiDollarSign, FiPackage, FiHelpCircle } from 'react-icons/fi';
+import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool } from 'react-icons/fi';
 import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getToken, removeToken, isAuthenticated, logout } from '@/utils/auth';
 import IspSelector from '@/components/isp/IspSelector';
-import { PlanCard, TroubleshootingSteps, StatusMessage, QuickActions } from '@/components/chat/MessageTypes';
+import { PlanCard, TroubleshootingSteps, StatusMessage } from '@/components/chat/MessageTypes';
 import { ChatHistory } from '@/components/chat/ChatHistory';
 import { LeftPanel } from '@/components/layout/LeftPanel';
 import Notification from '@/components/common/Notification';
@@ -35,33 +35,6 @@ export default function ChatPage() {
     const [isFirstVisit, setIsFirstVisit] = useState(true);
     const [isNewUser, setIsNewUser] = useState(true);
     const [isLoaded, setIsLoaded] = useState(false);
-
-    const defaultQuickActions = [
-        {
-            id: 'check-plans',
-            label: 'Check Available Plans',
-            icon: <FiPackage />,
-            onClick: () => handleQuickAction({ id: 'check-plans', label: 'Check Available Plans' })
-        },
-        {
-            id: 'troubleshoot',
-            label: 'Troubleshoot Connection',
-            icon: <FiTool />,
-            onClick: () => handleQuickAction({ id: 'troubleshoot', label: 'Troubleshoot Connection' })
-        },
-        {
-            id: 'billing',
-            label: 'Billing Inquiries',
-            icon: <FiDollarSign />,
-            onClick: () => handleQuickAction({ id: 'billing', label: 'Billing Inquiries' })
-        },
-        {
-            id: 'support',
-            label: 'General Support',
-            icon: <FiHelpCircle />,
-            onClick: () => handleQuickAction({ id: 'support', label: 'General Support' })
-        }
-    ];
 
     // Fetch user info on component mount
     useEffect(() => {
@@ -331,80 +304,6 @@ export default function ChatPage() {
         }
     };
 
-    const handleQuickAction = async (action) => {
-        if (!selectedProvider) {
-            const warningMessage = {
-                type: 'status',
-                status: {
-                    type: 'warning',
-                    message: 'Please select an Internet Service Provider first.'
-                },
-                timestamp: new Date().toISOString()
-            };
-            setMessages(prev => [...prev, warningMessage]);
-            return;
-        }
-
-        const userMessage = {
-            message: `I want to ${action.label.toLowerCase()}`,
-            timestamp: new Date().toISOString(),
-            isUser: true
-        };
-        setMessages(prev => [...prev, userMessage]);
-
-        setIsLoading(true);
-        setIsTyping(true);
-
-        try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE_URL}/chat/send`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: userMessage.message,
-                    provider: selectedProvider.name,
-                    action: action.id
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch response');
-            }
-
-            const data = await response.json();
-            
-            if (data.success) {
-                const botResponse = {
-                    timestamp: new Date().toISOString(),
-                    isBot: true,
-                    type: data.type,
-                    message: data.message,
-                    content: data.content
-                };
-                setMessages(prev => [...prev, botResponse]);
-            } else {
-                throw new Error(data.message || 'Failed to get response');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            const errorMessage = {
-                type: 'status',
-                status: {
-                    type: 'error',
-                    message: 'Failed to process quick action. Please try again.'
-                },
-                timestamp: new Date().toISOString()
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setIsLoading(false);
-            setIsTyping(false);
-        }
-    };
-
     const renderMessage = (message) => {
         if (message.type === 'status') {
             return <StatusMessage status={message.status} />;
@@ -442,7 +341,6 @@ export default function ChatPage() {
                 <div className={message.isUser ? styles.userMessage : styles.botMessage}>
                     <div className={styles.messageContent}>
                         <ReactMarkdown>{message.message}</ReactMarkdown>
-                        {message.actions && <QuickActions actions={message.actions} />}
                     </div>
                 </div>
             </div>
@@ -607,10 +505,6 @@ export default function ChatPage() {
                         <FiSend />
                     </button>
                 </form>
-
-                <div className={`${styles.quickActionsContainer} quickActions`}>
-                    <QuickActions actions={defaultQuickActions} />
-                </div>
             </div>
 
             <div className={`${styles.rightPanel} chatHistory`}>

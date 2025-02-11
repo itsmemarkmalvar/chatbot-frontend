@@ -1,11 +1,60 @@
+.ispSelector {
+    padding: 1rem;
+}
+
+.ispSelector h2 {
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+}
+
 .ispSelectorContainer {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: #111111;
-    padding: 1.5rem;
-    gap: 2rem;
-    overflow-y: auto;
+    gap: 1.5rem;
+}
+
+.providersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.providerButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.providerButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.providerButton.active {
+    background: var(--provider-color);
+    border-color: var(--provider-color);
+}
+
+.providerLogo {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.providerName {
+    font-size: 0.875rem;
+    color: #e2e8f0;
+    text-align: center;
 }
 
 .ispHeader {
@@ -18,78 +67,6 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0;
-}
-
-.providersGrid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-}
-
-.providerButton {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 0.75rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #e2e8f0;
-    width: 100%;
-}
-
-.providerButton:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.providerButton:hover .providerLogo {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(var(--provider-color), 0.2);
-}
-
-.providerButton.active {
-    background: linear-gradient(
-        135deg,
-        rgba(var(--provider-color), 0.1),
-        rgba(var(--provider-color), 0.2)
-    );
-    border-color: var(--provider-color);
-    box-shadow: 0 0 20px rgba(var(--provider-color), 0.1);
-}
-
-.providerButton.active .providerLogo {
-    background: rgba(var(--provider-color), 0.1);
-    box-shadow: 0 4px 15px rgba(var(--provider-color), 0.2);
-}
-
-.providerLogo {
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.75rem;
-    transition: all 0.3s ease;
-}
-
-.providerLogo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: all 0.3s ease;
-}
-
-.providerName {
-    font-weight: 500;
-    font-size: 1.125rem;
-    flex: 1;
-    text-align: left;
 }
 
 .categorySection {
@@ -157,15 +134,4 @@
 
 .ispSelectorContainer {
     animation: fadeIn 0.3s ease-out;
-}
-
-.ispSelector {
-    padding: 1.5rem;
-}
-
-.ispSelector h2 {
-    margin: 0 0 1.5rem 0;
-    font-size: 1.25rem;
-    color: #e2e8f0;
-    font-weight: 600;
 } 
