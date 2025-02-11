@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '@/styles/isp.module.css';
 import Image from 'next/image';
-import { FiWifi, FiTool, FiDollarSign, FiHelpCircle } from 'react-icons/fi';
+import { FiTool, FiDollarSign, FiHelpCircle } from 'react-icons/fi';
 
 const providers = [
     {
@@ -22,7 +22,6 @@ const providers = [
 ];
 
 const categories = [
-    { icon: <FiWifi />, name: 'Internet Plans', id: 'plans' },
     { icon: <FiTool />, name: 'Technical Support', id: 'support' },
     { icon: <FiDollarSign />, name: 'Billing', id: 'billing' },
     { icon: <FiHelpCircle />, name: 'FAQs', id: 'faqs' }

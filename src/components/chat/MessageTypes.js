@@ -50,25 +50,30 @@ export const PlanCard = ({ plan }) => {
         <div className={`${styles.planCard} ${styles[plan.type || 'residential']}`}>
             <div className={styles.planHeader}>
                 <div className={styles.planInfo}>
-                    <h3>{plan.name}</h3>
+                    <h3 className={styles.planName}>{plan.name}</h3>
                     {plan.type && (
                         <span className={styles.planType}>
                             {plan.type.charAt(0).toUpperCase() + plan.type.slice(1)}
                         </span>
                     )}
                 </div>
-                <span className={styles.planPrice}>₱{plan.price}/mo</span>
+                <div className={styles.planPrice}>
+                    ₱{typeof plan.price === 'number' ? plan.price.toLocaleString() : plan.price}/mo
+                </div>
             </div>
             {renderSpeed()}
             <ul className={styles.planFeatures}>
-                {plan.features.map((feature, index) => (
+                {plan.features && plan.features.map((feature, index) => (
                     <li key={index}>
                         <FiCheck className={styles.featureIcon} />
-                        {feature}
+                        <span>{feature}</span>
                     </li>
                 ))}
             </ul>
-            <button className={styles.planButton}>Learn More</button>
+            <button className={styles.planButton}>
+                Learn More
+                <FiArrowRight className={styles.buttonIcon} />
+            </button>
         </div>
     );
 };

@@ -168,50 +168,53 @@ export default function ChatPage() {
         };
         setMessages(prev => [...prev, userMessage]);
 
-        // Simulate bot processing
         setIsLoading(true);
         setIsTyping(true);
 
         try {
             const token = getToken();
+            if (!token) {
+                throw new Error('Authentication token not found');
+            }
+
             const response = await fetch(`${API_BASE_URL}/chat/send`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     message: userMessage.message,
                     provider: selectedProvider.name,
-                    category: categoryId
+                    category: categoryId,
+                    userName: userInfo?.name
                 })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch response');
+                throw new Error(`Failed to fetch response: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log('API Response:', data);
+
+            const botResponse = {
+                timestamp: new Date().toISOString(),
+                isBot: true,
+                type: data.type,
+                message: data.message,
+                content: data.content
+            };
             
-            if (data.success) {
-                const botResponse = {
-                    timestamp: new Date().toISOString(),
-                    isBot: true,
-                    type: data.type,
-                    message: data.message,
-                    content: data.content
-                };
-                setMessages(prev => [...prev, botResponse]);
-            } else {
-                throw new Error(data.message || 'Failed to get response');
-            }
+            setMessages(prev => [...prev, botResponse]);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error in handleCategorySelect:', error);
             const errorMessage = {
                 type: 'status',
                 status: {
                     type: 'error',
-                    message: 'Failed to fetch information. Please try again.'
+                    message: error.message || 'Failed to fetch information. Please try again.'
                 },
                 timestamp: new Date().toISOString()
             };
@@ -311,13 +314,25 @@ export default function ChatPage() {
 
         if (message.type === 'plans' && message.content?.plans) {
             return (
-                <div className={styles.messageWrapper} data-user={message.isUser}>
+                <div className={styles.messageWrapper}>
                     <div className={styles.botMessage}>
                         <div className={styles.messageContent}>
-                            <h3>Available Plans</h3>
+                            <div className={styles.messageHeader}>
+                                <RiRobot2Line className={styles.botIcon} />
+                                <span className={styles.timestamp}>
+                                    {new Date(message.timestamp).toLocaleTimeString()}
+                                </span>
+                            </div>
+                            <p className={styles.planIntro}>{message.message}</p>
                             <div className={styles.plansGrid}>
                                 {message.content.plans.map((plan, index) => (
-                                    <PlanCard key={index} plan={plan} />
+                                    <PlanCard 
+                                        key={`${plan.name}-${index}`} 
+                                        plan={{
+                                            ...plan,
+                                            type: plan.type || 'residential'
+                                        }} 
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -328,8 +343,14 @@ export default function ChatPage() {
 
         if (message.type === 'support' && message.content?.steps) {
             return (
-                <div className={styles.messageWrapper} data-user={message.isUser}>
+                <div className={styles.messageWrapper}>
                     <div className={styles.botMessage}>
+                        <div className={styles.messageHeader}>
+                            <RiRobot2Line className={styles.botIcon} />
+                            <span className={styles.timestamp}>
+                                {new Date(message.timestamp).toLocaleTimeString()}
+                            </span>
+                        </div>
                         <TroubleshootingSteps steps={message.content.steps} />
                     </div>
                 </div>
@@ -339,6 +360,16 @@ export default function ChatPage() {
         return (
             <div className={styles.messageWrapper} data-user={message.isUser}>
                 <div className={message.isUser ? styles.userMessage : styles.botMessage}>
+                    <div className={styles.messageHeader}>
+                        {message.isUser ? (
+                            <FiUser className={styles.userIcon} />
+                        ) : (
+                            <RiRobot2Line className={styles.botIcon} />
+                        )}
+                        <span className={styles.timestamp}>
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                        </span>
+                    </div>
                     <div className={styles.messageContent}>
                         <ReactMarkdown>{message.message}</ReactMarkdown>
                     </div>
