@@ -30,7 +30,7 @@ const categories = [
 
 const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) => {
     return (
-        <div className={styles.ispSelector}>
+        <div className={styles.ispSelector} data-tour="isp-selector">
             <h2>Select Internet Service Provider</h2>
             <div className={styles.ispSelectorContainer}>
                 <div className={styles.providersGrid}>
@@ -55,7 +55,7 @@ const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) =
                     ))}
                 </div>
 
-                <div className={styles.categorySection}>
+                <div className={styles.categorySection} data-tour="quick-access">
                     <h3>Quick Access</h3>
                     <div className={styles.categoryGrid}>
                         {categories.map((category) => (

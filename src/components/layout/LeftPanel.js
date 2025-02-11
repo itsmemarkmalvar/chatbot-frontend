@@ -20,6 +20,7 @@ export const LeftPanel = ({ selectedProvider, onProviderSelect, onCategorySelect
                 <button
                     className={`${styles.tabButton} ${activeTab === 'history' ? styles.active : ''}`}
                     onClick={() => setActiveTab('history')}
+                    data-tour="chat-history"
                 >
                     <FiMessageSquare />
                     History

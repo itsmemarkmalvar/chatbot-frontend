@@ -113,7 +113,9 @@ export const StatusMessage = ({ status }) => {
     );
 };
 
-export const QuickActions = ({ actions }) => {
+export const QuickActions = ({ actions = [] }) => {
+    if (!actions || actions.length === 0) return null;
+
     return (
         <div className={styles.quickActions}>
             {actions.map((action, index) => (
@@ -121,6 +123,7 @@ export const QuickActions = ({ actions }) => {
                     key={index}
                     className={styles.actionButton}
                     onClick={action.onClick}
+                    disabled={action.disabled}
                 >
                     {action.icon}
                     <span>{action.label}</span>

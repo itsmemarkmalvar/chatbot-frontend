@@ -1,0 +1,183 @@
+/* Custom Tour Styles */
+.customTour.customTour {
+  --highlight-bg: rgba(0, 122, 255, 0.1);
+  --highlight-border: #007AFF;
+  --popover-bg: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #666666;
+  --button-bg: #007AFF;
+  --button-text: #ffffff;
+  --overlay-bg: rgba(0, 0, 0, 0.65);
+  --button-hover-bg: #0056b3;
+  --button-active-bg: #004494;
+  --button-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .customTour.customTour {
+    --popover-bg: #1a1a1a;
+    --text-color: #ffffff;
+    --text-secondary: #cccccc;
+    --highlight-bg: rgba(0, 122, 255, 0.15);
+    --button-hover-bg: #1a86ff;
+    --button-active-bg: #0069d9;
+    --button-shadow: 0 2px 4px rgba(0, 122, 255, 0.4);
+  }
+}
+
+.customTour.customTour :global(.driver-popover) {
+  background: var(--popover-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: none;
+  animation: slideIn 0.3s ease-out;
+  max-width: 400px;
+}
+
+.customTour.customTour :global(.driver-popover-title) {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 12px;
+}
+
+.customTour.customTour :global(.driver-popover-title h3) {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.customTour.customTour :global(.driver-popover-description) {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.customTour.customTour :global(.driver-popover-footer) {
+  margin-top: 20px;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.customTour.customTour :global(.driver-popover-progress-text) {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: rgba(0, 122, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Button base styles */
+.customTour.customTour :global(.driver-popover-prev-btn),
+.customTour.customTour :global(.driver-popover-next-btn),
+.customTour.customTour :global(.driver-popover-done-btn) {
+  all: unset;
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--button-shadow);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Previous button specific styles */
+.customTour.customTour :global(.driver-popover-prev-btn) {
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  border: 2px solid currentColor;
+}
+
+/* Next/Done button specific styles */
+.customTour.customTour :global(.driver-popover-next-btn),
+.customTour.customTour :global(.driver-popover-done-btn) {
+  background: var(--button-bg);
+  position: relative;
+  padding-right: 24px;
+}
+
+/* Arrow indicators */
+.customTour.customTour :global(.driver-popover-next-btn)::after,
+.customTour.customTour :global(.driver-popover-done-btn)::after {
+  content: '→';
+  position: absolute;
+  right: 12px;
+  transition: transform 0.2s ease;
+}
+
+.customTour.customTour :global(.driver-popover-prev-btn)::before {
+  content: '←';
+  margin-right: 4px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+/* Hover states */
+.customTour.customTour :global(.driver-popover-prev-btn:hover) {
+  color: var(--button-bg);
+  border-color: var(--button-bg);
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.customTour.customTour :global(.driver-popover-next-btn:hover),
+.customTour.customTour :global(.driver-popover-done-btn:hover) {
+  background: var(--button-hover-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 122, 255, 0.3);
+}
+
+.customTour.customTour :global(.driver-popover-next-btn:hover::after),
+.customTour.customTour :global(.driver-popover-done-btn:hover::after) {
+  transform: translateX(3px);
+}
+
+.customTour.customTour :global(.driver-popover-prev-btn:hover::before) {
+  transform: translateX(-3px);
+}
+
+/* Active states */
+.customTour.customTour :global(.driver-popover-next-btn:active),
+.customTour.customTour :global(.driver-popover-done-btn:active) {
+  background: var(--button-active-bg);
+  transform: translateY(1px);
+  box-shadow: var(--button-shadow);
+}
+
+.customTour.customTour :global(.driver-overlay) {
+  background: var(--overlay-bg);
+  opacity: 1;
+}
+
+.customTour.customTour :global(.driver-highlighted-element) {
+  border: 2px solid var(--highlight-border);
+  background: var(--highlight-bg);
+  border-radius: 8px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

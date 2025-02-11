@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/chat.module.css';
-import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool, FiDollarSign } from 'react-icons/fi';
+import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool, FiDollarSign, FiPackage, FiHelpCircle } from 'react-icons/fi';
 import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,7 @@ import { ChatHistory } from '@/components/chat/ChatHistory';
 import { LeftPanel } from '@/components/layout/LeftPanel';
 import Notification from '@/components/common/Notification';
 import { getIspAiName, getIspAiFullName } from '@/utils/ispConfig';
+import GuidedTour from '@/components/common/GuidedTour';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -31,6 +32,36 @@ export default function ChatPage() {
     const inputRef = useRef(null);
     const router = useRouter();
     const [notification, setNotification] = useState({ message: '', type: '' });
+    const [isFirstVisit, setIsFirstVisit] = useState(true);
+    const [isNewUser, setIsNewUser] = useState(true);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    const defaultQuickActions = [
+        {
+            id: 'check-plans',
+            label: 'Check Available Plans',
+            icon: <FiPackage />,
+            onClick: () => handleQuickAction({ id: 'check-plans', label: 'Check Available Plans' })
+        },
+        {
+            id: 'troubleshoot',
+            label: 'Troubleshoot Connection',
+            icon: <FiTool />,
+            onClick: () => handleQuickAction({ id: 'troubleshoot', label: 'Troubleshoot Connection' })
+        },
+        {
+            id: 'billing',
+            label: 'Billing Inquiries',
+            icon: <FiDollarSign />,
+            onClick: () => handleQuickAction({ id: 'billing', label: 'Billing Inquiries' })
+        },
+        {
+            id: 'support',
+            label: 'General Support',
+            icon: <FiHelpCircle />,
+            onClick: () => handleQuickAction({ id: 'support', label: 'General Support' })
+        }
+    ];
 
     // Fetch user info on component mount
     useEffect(() => {
@@ -53,6 +84,9 @@ export default function ChatPage() {
                     const data = await response.json();
                     if (data.success) {
                         setUserInfo(data);
+                        setIsNewUser(data.is_new_user);
+                        setIsFirstVisit(data.is_new_user);
+                        setIsLoaded(true);
                     } else {
                         console.error('Failed to fetch user info:', data.error);
                         setNotification({
@@ -101,7 +135,6 @@ export default function ChatPage() {
             return;
         }
         
-        // Small delay to ensure content is rendered
         setTimeout(scrollToBottom, 100);
         inputRef.current?.focus();
     }, []);
@@ -298,6 +331,80 @@ export default function ChatPage() {
         }
     };
 
+    const handleQuickAction = async (action) => {
+        if (!selectedProvider) {
+            const warningMessage = {
+                type: 'status',
+                status: {
+                    type: 'warning',
+                    message: 'Please select an Internet Service Provider first.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, warningMessage]);
+            return;
+        }
+
+        const userMessage = {
+            message: `I want to ${action.label.toLowerCase()}`,
+            timestamp: new Date().toISOString(),
+            isUser: true
+        };
+        setMessages(prev => [...prev, userMessage]);
+
+        setIsLoading(true);
+        setIsTyping(true);
+
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE_URL}/chat/send`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: userMessage.message,
+                    provider: selectedProvider.name,
+                    action: action.id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch response');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
+                const botResponse = {
+                    timestamp: new Date().toISOString(),
+                    isBot: true,
+                    type: data.type,
+                    message: data.message,
+                    content: data.content
+                };
+                setMessages(prev => [...prev, botResponse]);
+            } else {
+                throw new Error(data.message || 'Failed to get response');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            const errorMessage = {
+                type: 'status',
+                status: {
+                    type: 'error',
+                    message: 'Failed to process quick action. Please try again.'
+                },
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+            setIsTyping(false);
+        }
+    };
+
     const renderMessage = (message) => {
         if (message.type === 'status') {
             return <StatusMessage status={message.status} />;
@@ -373,20 +480,22 @@ export default function ChatPage() {
 
     return (
         <div className={styles.mainContainer}>
+            {isLoaded && <GuidedTour isFirstVisit={isFirstVisit} />}
             <Notification 
                 message={notification.message}
                 type={notification.type}
                 onClose={() => setNotification({ message: '', type: '' })}
             />
-            <LeftPanel
-                selectedProvider={selectedProvider}
-                onProviderSelect={handleProviderSelect}
-                onCategorySelect={handleCategorySelect}
-                onSelectChat={handleChatSelect}
-                onNotification={handleNotification}
-            />
+            <div className="ispSelector">
+                <LeftPanel
+                    selectedProvider={selectedProvider}
+                    onProviderSelect={handleProviderSelect}
+                    onCategorySelect={handleCategorySelect}
+                    onSelectChat={handleChatSelect}
+                    onNotification={handleNotification}
+                />
+            </div>
 
-            {/* Chat Panel */}
             <div className={styles.chatPanel}>
                 {/* Chat Header */}
                 <div className={styles.chatHeader}>
@@ -416,7 +525,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Messages Container */}
-                <div ref={messagesContainerRef} className={styles.messagesContainer}>
+                <div ref={messagesContainerRef} className={`${styles.messagesContainer} messageTypes`} data-tour="chat-area">
                     {messages.length === 0 && (
                         <div className={styles.welcomeContainer}>
                             <h1 className={styles.welcomeTitle}>Welcome to ISP Support Assistant</h1>
@@ -478,7 +587,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Input Area */}
-                <form onSubmit={handleSubmit} className={styles.inputArea}>
+                <form onSubmit={handleSubmit} className={`${styles.inputArea} chatInput`} data-tour="chat-input">
                     <input
                         ref={inputRef}
                         type="text"
@@ -486,8 +595,7 @@ export default function ChatPage() {
                         onChange={(e) => setInputMessage(e.target.value)}
                         placeholder={selectedProvider 
                             ? `Ask ${selectedProvider.name} Support a question...`
-                            : "Select an ISP to start chatting..."
-                        }
+                            : "Select an ISP to start chatting..."}
                         disabled={!selectedProvider || isLoading}
                         className={styles.input}
                     />
@@ -499,6 +607,18 @@ export default function ChatPage() {
                         <FiSend />
                     </button>
                 </form>
+
+                <div className={`${styles.quickActionsContainer} quickActions`}>
+                    <QuickActions actions={defaultQuickActions} />
+                </div>
+            </div>
+
+            <div className={`${styles.rightPanel} chatHistory`}>
+                <ChatHistory
+                    chats={messages}
+                    onSelectChat={handleChatSelect}
+                    selectedChat={selectedChat}
+                />
             </div>
         </div>
     );

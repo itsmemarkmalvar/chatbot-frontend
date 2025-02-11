@@ -5,6 +5,7 @@
     background: #111111;
     padding: 1.5rem;
     gap: 2rem;
+    overflow-y: auto;
 }
 
 .ispHeader {
@@ -93,6 +94,7 @@
 
 .categorySection {
     margin-top: 2rem;
+    padding-bottom: 1rem;
 }
 
 .categorySection h3 {
