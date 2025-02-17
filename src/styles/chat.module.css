@@ -1588,4 +1588,11 @@
 /* Ensure messages don't get hidden behind input */
 .messageWrapper:last-child {
     margin-bottom: 1rem;
+}
+
+.messageText {
+    color: #e2e8f0;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0.5rem 0 1rem;
 } 

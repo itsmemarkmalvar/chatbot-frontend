@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getToken, removeToken, isAuthenticated, logout } from '@/utils/auth';
 import IspSelector from '@/components/isp/IspSelector';
-import { PlanCard, TroubleshootingSteps, StatusMessage } from '@/components/chat/MessageTypes';
+import { PlanCard, TroubleshootingSteps, StatusMessage, FaqList } from '@/components/chat/MessageTypes';
 import { ChatHistory } from '@/components/chat/ChatHistory';
 import { LeftPanel } from '@/components/layout/LeftPanel';
 import Notification from '@/components/common/Notification';
@@ -310,6 +310,31 @@ export default function ChatPage() {
     const renderMessage = (message) => {
         if (message.type === 'status') {
             return <StatusMessage status={message.status} />;
+        }
+
+        if (message.type === 'faq_list' && message.content?.categories) {
+            return (
+                <div className={styles.messageWrapper}>
+                    <div className={styles.botMessage}>
+                        <div className={styles.messageContent}>
+                            <div className={styles.messageHeader}>
+                                <RiRobot2Line className={styles.botIcon} />
+                                <span className={styles.timestamp}>
+                                    {new Date(message.timestamp).toLocaleTimeString()}
+                                </span>
+                            </div>
+                            <p className={styles.messageText}>{message.message}</p>
+                            <FaqList 
+                                faqData={message.content} 
+                                onQuestionClick={(question) => {
+                                    setInputMessage(question);
+                                    handleSubmit({ preventDefault: () => {} });
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
         }
 
         if (message.type === 'plans' && message.content?.plans) {

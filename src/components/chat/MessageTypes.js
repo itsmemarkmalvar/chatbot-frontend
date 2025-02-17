@@ -137,4 +137,56 @@ export const QuickActions = ({ actions = [] }) => {
             ))}
         </div>
     );
+};
+
+export const FaqList = ({ faqData, onQuestionClick }) => {
+    if (!faqData) {
+        console.warn('No FAQ data provided');
+        return null;
+    }
+
+    if (!faqData.categories || !Array.isArray(faqData.categories)) {
+        console.warn('Invalid FAQ categories structure', faqData);
+        return null;
+    }
+
+    if (faqData.categories.length === 0) {
+        return (
+            <div className={styles.faqEmpty}>
+                <p>No FAQ categories available at the moment.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className={styles.faqContainer}>
+            {faqData.categories.map((category, categoryIndex) => {
+                if (!category || !category.questions) {
+                    console.warn('Invalid category structure', category);
+                    return null;
+                }
+
+                return (
+                    <div key={category.id || categoryIndex} className={styles.faqCategory}>
+                        <div className={styles.categoryHeader}>
+                            <h3 className={styles.categoryTitle}>
+                                {category.title || 'General Questions'}
+                            </h3>
+                        </div>
+                        <div className={styles.questionsList}>
+                            {category.questions.map((question, questionIndex) => (
+                                <button
+                                    key={questionIndex}
+                                    className={styles.questionButton}
+                                    onClick={() => onQuestionClick(question)}
+                                >
+                                    <span className={styles.questionText}>{question}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
 }; 
