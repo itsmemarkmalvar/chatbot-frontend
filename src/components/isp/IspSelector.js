@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '@/styles/isp.module.css';
 import Image from 'next/image';
-import { FiTool, FiDollarSign, FiHelpCircle } from 'react-icons/fi';
+import { FiWifi, FiTool, FiDollarSign, FiHelpCircle, FiInfo } from 'react-icons/fi';
+import AboutModal from '@/components/common/AboutModal';
 
 const providers = [
     {
@@ -21,13 +22,46 @@ const providers = [
     }
 ];
 
-const categories = [
-    { icon: <FiTool />, name: 'Technical Support', id: 'support' },
-    { icon: <FiDollarSign />, name: 'Billing', id: 'billing' },
-    { icon: <FiHelpCircle />, name: 'FAQs', id: 'faqs' }
-];
-
 const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) => {
+    const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+
+    const categories = [
+        {
+            id: 'plans',
+            name: 'Internet Plans',
+            icon: <FiWifi />,
+        },
+        {
+            id: 'support',
+            name: 'Technical Support',
+            icon: <FiTool />,
+        },
+        {
+            id: 'billing',
+            name: 'Billing',
+            icon: <FiDollarSign />,
+        },
+        {
+            id: 'faq',
+            name: 'FAQs',
+            icon: <FiHelpCircle />,
+        },
+        {
+            id: 'about',
+            name: 'About',
+            icon: <FiInfo />,
+            onClick: () => setIsAboutModalOpen(true),
+        },
+    ];
+
+    const handleCategoryClick = (category) => {
+        if (category.onClick) {
+            category.onClick();
+        } else {
+            onCategorySelect(category.id);
+        }
+    };
+
     return (
         <div className={styles.ispSelector} data-tour="isp-selector">
             <h2>Select Internet Service Provider</h2>
@@ -61,7 +95,7 @@ const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) =
                             <button
                                 key={category.id}
                                 className={styles.categoryButton}
-                                onClick={() => onCategorySelect(category.id)}
+                                onClick={() => handleCategoryClick(category)}
                             >
                                 <span className={styles.categoryIcon}>{category.icon}</span>
                                 <span className={styles.categoryName}>{category.name}</span>
@@ -70,6 +104,11 @@ const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) =
                     </div>
                 </div>
             </div>
+
+            <AboutModal 
+                isOpen={isAboutModalOpen} 
+                onClose={() => setIsAboutModalOpen(false)} 
+            />
         </div>
     );
 };
