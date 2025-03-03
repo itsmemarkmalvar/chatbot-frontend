@@ -42,7 +42,7 @@ const IspSelector = ({ selectedProvider, onProviderSelect, onCategorySelect }) =
             icon: <FiDollarSign />,
         },
         {
-            id: 'faq',
+            id: 'faqs',
             name: 'FAQs',
             icon: <FiHelpCircle />,
         },
