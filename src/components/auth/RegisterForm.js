@@ -56,31 +56,65 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
+      console.log('Sending registration request:', 
+        JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          password_confirmation: formData.password_confirmation
+        })
+      );
+      
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify(formData),
-        credentials: 'include',
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          password_confirmation: formData.password_confirmation
+        })
       });
 
-      const data = await response.json();
+      // Log the raw response for debugging
+      const responseText = await response.text();
+      console.log('Raw API response:', responseText);
+      
+      // Try to parse the response as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Error parsing JSON response:', parseError);
+        throw new Error('Server returned an invalid response');
+      }
 
       if (response.ok) {
+        console.log('Registration successful:', data);
         setToken(data.token);
-        setUser(data.user);
+        try {
+          setUser(data.user);
+        } catch (userError) {
+          console.warn('Error setting user data:', userError);
+        }
         router.push('/chat');
       } else {
-        setError(data.message || 'Registration failed. Please try again.');
-        if (data.errors) {
+        console.error('Registration failed:', data);
+        if (data.message) {
+          setError(data.message);
+        } else if (data.errors) {
           const errorMessages = Object.values(data.errors).flat();
           setError(errorMessages.join(' '));
+        } else {
+          setError('Registration failed. Please try again.');
         }
       }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
       console.error('Registration error:', err);
+      setError(`Error: ${err.message || 'An unknown error occurred'}`);
     } finally {
       setTimeout(() => {
         setIsLoading(false);

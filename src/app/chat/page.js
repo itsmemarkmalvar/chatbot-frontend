@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/chat.module.css';
-import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool } from 'react-icons/fi';
+import { FiSend, FiUser, FiCopy, FiCheck, FiLogOut, FiSettings, FiRefreshCw, FiWifi, FiTool, FiHelpCircle } from 'react-icons/fi';
 import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,7 @@ import { ChatHistory } from '@/components/chat/ChatHistory';
 import { LeftPanel } from '@/components/layout/LeftPanel';
 import Notification from '@/components/common/Notification';
 import { getIspAiName, getIspAiFullName } from '@/utils/ispConfig';
-import GuidedTour from '@/components/common/GuidedTour';
+import GuidedTour, { resetTour } from '@/components/common/GuidedTour';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -58,12 +58,19 @@ export default function ChatPage() {
                     if (data.success) {
                         setUserInfo(data);
                         setIsNewUser(data.is_new_user);
-                        setIsFirstVisit(data.is_new_user);
                         
-                        // Slight delay before setting loaded to true to ensure DOM is fully ready
+                        // Check localStorage for tourCompleted flag
+                        const tourCompleted = localStorage.getItem('tourCompleted');
+                        
+                        // Show tour if user is new OR tour was never completed (tourCompleted is null)
+                        const shouldShowTour = data.is_new_user || !tourCompleted;
+                        
+                        setIsFirstVisit(shouldShowTour);
+                        
+                        // Delay setting isLoaded to ensure DOM is ready first
                         setTimeout(() => {
                             setIsLoaded(true);
-                        }, 100);
+                        }, 500);
                     } else {
                         console.error('Failed to fetch user info:', data.error);
                         setNotification({
@@ -438,9 +445,15 @@ export default function ChatPage() {
         setNotification({ message, type });
     };
 
+    // GuidedTour component with memoization to prevent unnecessary rerenders
+    const renderGuidedTour = useCallback(() => {
+        if (!isLoaded) return null;
+        return <GuidedTour isFirstVisit={isFirstVisit} />;
+    }, [isLoaded, isFirstVisit]);
+
     return (
         <div className={styles.mainContainer}>
-            {isLoaded && <GuidedTour isFirstVisit={isFirstVisit} />}
+            {renderGuidedTour()}
             <Notification 
                 message={notification.message}
                 type={notification.type}
@@ -474,6 +487,29 @@ export default function ChatPage() {
                                 </p>
                             )}
                         </div>
+                        <button 
+                            className={styles.helpButton}
+                            onClick={() => {
+                                // Get the token to check if user is authenticated
+                                const token = getToken();
+                                if (!token) return;
+                                
+                                // Reset the tour in a safer way by first unmounting it
+                                setIsFirstVisit(false);
+                                // Use a short timeout to ensure component unmounts first
+                                setTimeout(() => {
+                                    resetTour();
+                                    setIsFirstVisit(true);
+                                    setNotification({
+                                        message: 'Guided tour restarted',
+                                        type: 'success'
+                                    });
+                                }, 100);
+                            }}
+                            title="Help"
+                        >
+                            <FiHelpCircle />
+                        </button>
                         <button 
                             className={styles.logoutButton}
                             onClick={handleLogout}
