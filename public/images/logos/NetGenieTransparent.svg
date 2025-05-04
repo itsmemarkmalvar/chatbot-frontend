@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <!-- Outline rectangle with rounded corners -->
+  <rect x="60" y="60" width="380" height="380" rx="40" fill="transparent" stroke="#5fe619" stroke-width="20"/>
+  
+  <!-- Vertical slider bars left -->
+  <line x1="140" y1="140" x2="140" y2="360" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="140" cy="180" r="15" fill="#5fe619" stroke="#5fe619" stroke-width="2"/>
+  <circle cx="140" cy="320" r="15" fill="#5fe619" stroke="#5fe619" stroke-width="2"/>
+  
+  <!-- Vertical slider bars right -->
+  <line x1="360" y1="140" x2="360" y2="360" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="360" cy="180" r="15" fill="#5fe619" stroke="#5fe619" stroke-width="2"/>
+  <circle cx="360" cy="320" r="15" fill="#5fe619" stroke="#5fe619" stroke-width="2"/>
+  
+  <!-- WiFi signal arcs -->
+  <path d="M170,250 A80,80 0 0,1 330,250" fill="transparent" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <path d="M190,220 A60,60 0 0,1 310,220" fill="transparent" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <path d="M210,190 A40,40 0 0,1 290,190" fill="transparent" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  
+  <!-- Center dot -->
+  <circle cx="250" cy="280" r="15" fill="#5fe619"/>
+  
+  <!-- Horizontal lines bottom -->
+  <line x1="120" y1="400" x2="200" y2="400" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <line x1="300" y1="400" x2="380" y2="400" stroke="#5fe619" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="250" cy="400" r="5" fill="#5fe619"/>
+  
+  <!-- NetGenie text -->
+  <text x="250" y="440" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#5fe619">NetGenie</text>
+</svg> 

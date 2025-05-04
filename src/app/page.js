@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import styles from './landing.module.css';
 import { FiArrowRight, FiMessageSquare, FiUsers, FiActivity, FiClock } from 'react-icons/fi';
 
@@ -25,9 +26,13 @@ export default function Landing() {
     <div className={`${styles.landingContainer} ${isLoaded ? styles.loaded : ''}`}>
       <header className={styles.header}>
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>
-            <FiMessageSquare />
-          </span>
+          <Image 
+            src="/images/logos/Logo.png" 
+            alt="NetGenie Logo" 
+            width={40} 
+            height={40} 
+            style={{ objectFit: 'contain' }}
+          />
           <span className={styles.logoText}>NetGenie</span>
         </div>
         <nav className={styles.nav}>
@@ -184,7 +189,13 @@ export default function Landing() {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerLogo}>
-            <FiMessageSquare />
+            <Image 
+              src="/images/logos/Logo.png" 
+              alt="NetGenie Logo" 
+              width={30} 
+              height={30} 
+              style={{ objectFit: 'contain' }}
+            />
             <span>NetGenie</span>
           </div>
           <div className={styles.footerLinks}>

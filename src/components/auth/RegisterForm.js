@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '@/styles/auth.module.css';
 import { setToken, setUser } from '@/utils/auth';
 import Modal from '@/components/common/Modal';
@@ -165,7 +166,13 @@ const RegisterForm = () => {
             <FiArrowLeft /> Back to home
           </Link>
           <div className={styles.logo}>
-            <span className={styles.logoIcon}><FiHome /></span>
+            <Image 
+              src="/images/logos/Logo.png" 
+              alt="NetGenie Logo" 
+              width={40} 
+              height={40} 
+              style={{ objectFit: 'contain' }}
+            />
             <span>NetGenie</span>
           </div>
           <form onSubmit={handleSubmit} className={styles.authForm}>
