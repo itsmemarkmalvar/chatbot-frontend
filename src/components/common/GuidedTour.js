@@ -84,7 +84,7 @@ const GuidedTour = ({ isFirstVisit }) => {
               {
                 element: '[data-tour="chat-area"]',
                 popover: {
-                  title: '<h3>Chat Area</h3>',
+                  title: '<h3>Chat Box</h3>',
                   description: 'This is where your conversation with our AI assistant will appear. Get instant support and solutions here.',
                   side: "bottom",
                   align: 'center',

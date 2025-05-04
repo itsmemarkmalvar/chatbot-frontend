@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/auth.module.css';
 import { setToken, setUser } from '@/utils/auth';
+import { FiHome, FiArrowLeft } from 'react-icons/fi';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -67,7 +68,13 @@ const LoginForm = () => {
     <div className={styles.pageWrapper}>
       <main className={styles.authContainer}>
         <section className={styles.formSection}>
-          <div className={styles.logo}>Chatbot AI</div>
+          <Link href="/" className={styles.backToHomeInternal}>
+            <FiArrowLeft /> Back to home
+          </Link>
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}><FiHome /></span>
+            <span>NetGenie</span>
+          </div>
           <form onSubmit={handleSubmit} className={styles.authForm}>
             {error && <div className={styles.error}>{error}</div>}
             
@@ -133,9 +140,9 @@ const LoginForm = () => {
           <div className={styles.mainCard}>
             <div className={styles.testimonial}>
               <div className={styles.botIcon}>🤖</div>
-              <h3>An AI-Powered Chatbot.</h3>
+              <h3>AI-Powered ISP Support</h3>
               <div className={styles.features}>
-                <p className={styles.mainFeature}>"AI-powered chatbot designed to revolutionize customer service interactions."</p>
+                <p className={styles.mainFeature}>"Get instant answers to all your ISP-related questions with our intelligent assistant."</p>
                 <ul className={styles.featureList}>
                   <li>✨ Instant ISP Support</li>
                   <li>🔍 Smart Problem Resolution</li>

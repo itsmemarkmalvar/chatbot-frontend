@@ -141,6 +141,7 @@
     width: 100%;
     justify-content: flex-start;
     padding: 0.25rem 0;
+    animation: slideIn 0.3s ease-out;
 }
 
 .messageWrapper[data-user="true"] {
@@ -288,17 +289,22 @@
 
 /* Animations */
 @keyframes slideIn {
-    from {
+    0% {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
-    to {
+    100% {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+/* Update the message wrapper animation */
 .messageWrapper {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.25rem 0;
     animation: slideIn 0.3s ease-out;
 }
 
@@ -553,7 +559,7 @@
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    animation: slideIn 0.3s ease-out;
+    animation: welcomeFadeIn 0.3s ease-out;
     max-width: 300px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -1140,7 +1146,7 @@
     color: #94a3b8;
     font-size: 0.875rem;
     margin: 0.5rem 0;
-    animation: fadeIn 0.3s ease-out;
+    animation: welcomeFadeIn 0.3s ease-out;
 }
 
 .plansGrid {
@@ -1419,14 +1425,20 @@
     text-align: center;
     padding: 1.25rem;
     max-width: 700px;
-    margin: 1rem auto;
+    margin: auto;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 1.25rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    animation: fadeIn 0.5s ease-out;
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    opacity: 0;
+    animation: welcomeFadeIn 0.5s ease-out forwards;
+    z-index: 10;
 }
 
 .welcomeTitle {
@@ -1517,14 +1529,12 @@
     transform: translateY(0);
 }
 
-@keyframes fadeIn {
-    from {
+@keyframes welcomeFadeIn {
+    0% {
         opacity: 0;
-        transform: translateY(20px);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -1532,7 +1542,11 @@
 @media (max-width: 768px) {
     .welcomeContainer {
         padding: 1rem;
-        margin: 0.5rem;
+        width: 95%;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        transform: translate(-50%, -50%);
     }
 
     .welcomeTitle {
@@ -1557,7 +1571,11 @@
 @media (max-height: 600px) {
     .welcomeContainer {
         padding: 1rem;
-        margin: 0.5rem;
+        width: 95%;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        transform: translate(-50%, -50%);
     }
 
     .welcomeTitle {

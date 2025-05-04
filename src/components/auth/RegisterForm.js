@@ -6,6 +6,7 @@ import Link from 'next/link';
 import styles from '@/styles/auth.module.css';
 import { setToken, setUser } from '@/utils/auth';
 import Modal from '@/components/common/Modal';
+import { FiHome, FiArrowLeft } from 'react-icons/fi';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -126,7 +127,13 @@ const RegisterForm = () => {
     <div className={styles.pageWrapper}>
       <main className={`${styles.authContainer} ${styles.registerContainer}`}>
         <section className={styles.formSection}>
-          <div className={styles.logo}>Chatbot AI</div>
+          <Link href="/" className={styles.backToHomeInternal}>
+            <FiArrowLeft /> Back to home
+          </Link>
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}><FiHome /></span>
+            <span>NetGenie</span>
+          </div>
           <form onSubmit={handleSubmit} className={styles.authForm}>
             <h2>Create your Account</h2>
             {error && <div className={styles.error}>{error}</div>}
@@ -254,15 +261,15 @@ const RegisterForm = () => {
         <section className={styles.contentSection}>
           <div className={styles.mainCard}>
             <div className={styles.testimonial}>
-              <div className={styles.botIcon}>🚀</div>
-              <h3>Join Our Smart Support Community</h3>
+              <div className={styles.botIcon}>🤖</div>
+              <h3>Join Our Smart ISP Support Network</h3>
               <div className={styles.features}>
-                <p className={styles.mainFeature}>"Experience the future of ISP customer support with our AI-powered platform."</p>
+                <p className={styles.mainFeature}>"Create an account to access personalized ISP support and recommendations for your internet service."</p>
                 <ul className={styles.featureList}>
-                  <li>🎯 Personalized Support Experience</li>
-                  <li>⚡ Quick Issue Resolution</li>
-                  <li>📱 Multi-Provider Support</li>
-                  <li>🔐 Secure Account Management</li>
+                  <li>✨ Personalized Recommendations</li>
+                  <li>🔍 Provider Expertise</li>
+                  <li>💬 Save Conversation History</li>
+                  <li>📊 Compare Plans and Options</li>
                 </ul>
               </div>
             </div>
@@ -270,13 +277,13 @@ const RegisterForm = () => {
         </section>
       </main>
 
-      <Modal
-        isOpen={showTermsModal}
-        onClose={() => setShowTermsModal(false)}
-        title="Terms and Conditions"
-      >
-        {termsAndConditions}
-      </Modal>
+      {showTermsModal && (
+        <Modal 
+          title="Terms and Conditions" 
+          onClose={() => setShowTermsModal(false)}
+          content={termsAndConditions}
+        />
+      )}
     </div>
   );
 };

@@ -59,13 +59,18 @@ export default function ChatPage() {
                         setUserInfo(data);
                         setIsNewUser(data.is_new_user);
                         setIsFirstVisit(data.is_new_user);
-                        setIsLoaded(true);
+                        
+                        // Slight delay before setting loaded to true to ensure DOM is fully ready
+                        setTimeout(() => {
+                            setIsLoaded(true);
+                        }, 100);
                     } else {
                         console.error('Failed to fetch user info:', data.error);
                         setNotification({
                             message: 'Failed to load user information',
                             type: 'error'
                         });
+                        setIsLoaded(true);
                     }
                 } else if (response.status === 401) {
                     // Unauthorized - token expired or invalid
@@ -80,6 +85,7 @@ export default function ChatPage() {
                     message: 'Error loading user information',
                     type: 'error'
                 });
+                setIsLoaded(true);
             }
         };
 
@@ -480,7 +486,7 @@ export default function ChatPage() {
 
                 {/* Messages Container */}
                 <div ref={messagesContainerRef} className={`${styles.messagesContainer} messageTypes`} data-tour="chat-area">
-                    {messages.length === 0 && (
+                    {isLoaded && messages.length === 0 && (
                         <div className={styles.welcomeContainer}>
                             <h1 className={styles.welcomeTitle}>Welcome to ISP Support Assistant</h1>
                             <p className={styles.welcomeSubtitle}>
